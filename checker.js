@@ -54,13 +54,19 @@ function write(content, file) {
     fs.appendFile(file, content, function(err) {});
 }
 
-function menu(options, numbered) {
+function menu(options, numbered, title) {
+    console.log(`\x1Bc`);
     process.title = "Tiktok Checker"; 
-    console.log(`\x1Bc
-                ${chalk.hex("552586")('╔╦╗┬┬┌─┌┬┐┌─┐┬┌─  ╔═╗┬ ┬┌─┐┌─┐┬┌─┌─┐┬─┐')}
-                ${chalk.hex("804FB3")(' ║ │├┴┐ │ │ │├┴┐  ║  ├─┤├┤ │  ├┴┐├┤ ├┬┘')}
-                ${chalk.underline.hex("B589D6")(' ╩ ┴┴ ┴ ┴ └─┘┴ ┴  ╚═╝┴ ┴└─┘└─┘┴ ┴└─┘┴└─')}
-    `);
+    if (title) {
+        printAsciiLogo();
+    }
+    else {
+        console.log(`
+                    ${chalk.hex("552586")('╔╦╗┬┬┌─┌┬┐┌─┐┬┌─  ╔═╗┬ ┬┌─┐┌─┐┬┌─┌─┐┬─┐')}
+                    ${chalk.hex("804FB3")(' ║ │├┴┐ │ │ │├┴┐  ║  ├─┤├┤ │  ├┴┐├┤ ├┬┘')}
+                    ${chalk.underline.hex("B589D6")(' ╩ ┴┴ ┴ ┴ └─┘┴ ┴  ╚═╝┴ ┴└─┘└─┘┴ ┴└─┘┴└─')}
+        `);
+    }
     
     options.forEach(function(item, index, array) {
         console.log("[%s] %s", numbered ? chalk.white(index+1) : "*", chalk.hex("DDA0DD")(item));
@@ -172,12 +178,10 @@ function printAsciiLogo() {
     console.log("");
     process.title = `[313] [Tiktok Usernames Checker] Created By Luci and Forked by Soup666`;
     console.log(`[${chalk.green('!')}] Tiktok Checker | Created by ${chalk.bold.red('Luci')} and Forked by ${chalk.bold.red('Soup666')} | Join! discord.gg/XKv5AEPKZu for support!`);
+    console.log(chalk.red(`[${chalk.white('!')}] Some Usernames may be banned and will show as Available!`));
 }
 
-printAsciiLogo();
-console.log(chalk.red(`[${chalk.white('!')}] Some Usernames may be banned and will show as Available!`));
-
-var options = menu(['Proxied Checking', 'Proxyless Checker (Proxies)', 'Username Generator', 'Use Wordlist (URL/File)'], true);
+var options = menu(['Proxied Checking', 'Proxyless Checker (Proxies)', 'Username Generator', 'Use Wordlist (URL/File)'], true, true);
 
 switch (options) {
     case "1":
