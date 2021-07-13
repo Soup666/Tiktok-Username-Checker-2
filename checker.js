@@ -1,21 +1,22 @@
 const request = require('request');
+const readline = require("readline");
 const colors = require('colors');
 const chalk = require('chalk');
 const ProxyAgent = require('proxy-agent');
-const prompt = require('prompt');
+const prompt = require('prompt-sync')({sigint: true});
 const UserAgent = require(`user-agents`);
 const fs = require('fs');
 const http = require('https');
 const proxies = fs.readFileSync('./extra/proxies.txt', 'utf-8').replace(/\r/gi, '').split('\n');
-var usernames = [...new Set(fs.readFileSync('usernames.txt', 'utf-8').replace(/\r/g, '').split('\n'))];
 const config = require("./extra/config.json");
 const validURL = require("valid-url");
 const validPath = require("path-validation");
 
-process.on('uncaughtException', e => {});
-process.on('uncaughtRejection', e => {});
-process.warn = () => {};
+//process.on('uncaughtException', e => {});
+//process.on('uncaughtRejection', e => {});
+//process.warn = () => {};
 
+var usernames = [...new Set(fs.readFileSync('usernames.txt', 'utf-8').replace(/\r/g, '').split('\n'))];
 var available = 0;
 var unavailable = 0;
 var rate = 0;
@@ -51,6 +52,21 @@ const download = (url, dest, cb) => {
 
 function write(content, file) {
     fs.appendFile(file, content, function(err) {});
+}
+
+function menu(options, numbered) {
+    process.title = "Tiktok Checker"; 
+    console.log(`\x1Bc
+                ${chalk.hex("552586")('╔╦╗┬┬┌─┌┬┐┌─┐┬┌─  ╔═╗┬ ┬┌─┐┌─┐┬┌─┌─┐┬─┐')}
+                ${chalk.hex("804FB3")(' ║ │├┴┐ │ │ │├┴┐  ║  ├─┤├┤ │  ├┴┐├┤ ├┬┘')}
+                ${chalk.underline.hex("B589D6")(' ╩ ┴┴ ┴ ┴ └─┘┴ ┴  ╚═╝┴ ┴└─┘└─┘┴ ┴└─┘┴└─')}
+    `);
+    
+    options.forEach(function(item, index, array) {
+        console.log("[%s] %s", numbered ? chalk.white(index+1) : "*", chalk.hex("DDA0DD")(item));
+    })
+    console.log("")
+    return prompt(chalk.hex("65727A")("prompt: "));
 }
 
 function pcheck(username) {
@@ -141,7 +157,6 @@ function Generate(dict, Size, Loops) {
     write(Name + "\n", "./extra/Generated.txt");
 }
 
-
 function printAsciiLogo() {
     console.log(chalk.hex("EE1D52")(`
     ▄▄▄█████▓ ██▓ ██ ▄█▀▄▄▄█████▓ ▒█████   ██ ▄█▀    ▄████▄   ██░ ██ ▓█████  ▄████▄   ██ ▄█▀▓█████  ██▀███  
@@ -155,137 +170,104 @@ function printAsciiLogo() {
             ░  ░  ░                ░ ░  ░  ░      ░ ░       ░  ░  ░   ░  ░░ ░      ░  ░      ░  ░   ░     
                                                 `));
     console.log("");
-    process.title = `[313] [Tiktok Usernames Checker] Created By Luci`;
-    console.log(`[${chalk.green('!')}] Tiktok Checker | Created by ${chalk.bold.red('Luci')} | Join! discord.gg/XKv5AEPKZu for support!`);
+    process.title = `[313] [Tiktok Usernames Checker] Created By Luci and Forked by Soup666`;
+    console.log(`[${chalk.green('!')}] Tiktok Checker | Created by ${chalk.bold.red('Luci')} and Forked by ${chalk.bold.red('Soup666')} | Join! discord.gg/XKv5AEPKZu for support!`);
 }
+
 printAsciiLogo();
 console.log(chalk.red(`[${chalk.white('!')}] Some Usernames may be banned and will show as Available!`));
-console.log("");
-console.log(chalk("[1] Proxied Checking "));
-console.log(chalk("[2] Proxyless Checker (Proxies)"));
-console.log(chalk("[3] Username Generator"));
-console.log(chalk("[4] Use Wordlist (Url/File)"));
-prompt.start();
-console.log("");
-prompt.get(['options'], function(err, result) {
-    console.log('');
-    var options = result.options;
-    switch (options) {
-        case "1":
-            console.log(`[Proxy] ${config.proxyType}`);
-            console.log(`[Tiktok Username Checker]: Started!`.inverse);
-            console.log(`[Checking %s Usernames with %s Proxies!]`.inverse, usernames.length, proxies.length);
-            for (var i in usernames) pcheck(usernames[i]);
-            break;
 
-        case "2":
-            console.log(`[Tiktok Username Checker]: Started!`.inverse);
-            console.log(`[Checking %s Usernames with No Proxies!]`.inverse, usernames.length, );
-            for (var i in usernames) check(usernames[i]);
-            break;
-        case "3":
-            console.clear();
-            prompt.start()
-            console.log("[?] How many chars for each Username!");
-            prompt.get(['Amount'], function(err, result) {
-                var Size = result.Amount;
-                console.log("[?] How many would you like to generate!");
-                prompt.get(['Generation'], function(err, result) {
-                    var Loops = result.Generation;
-                    console.log("");
-                    console.log("[1] Dictionary Type | AlphaNumerical | abcdefghijklmnopqrstuvwxyz0123456789");
-                    console.log("[2] Dictionary Type | Alphabet | abcdefghijklmnopqrstuvwxyz");
-                    prompt.get(['Letters'], function(err, result) {
-                        var Letters = result.Letters;
-                        switch (Letters) {
-                            case "1":
-                                var dict = "abcdefghijklmnopqrstuvwxyz0123456789";
-                                for (var i = 0; i < Loops; i++) {
-                                    Generate(dict, Size, Loops);
-                                }
-                                break;
-                            case "2":
-                                var dict = "abcdefghijklmnopqrstuvwxyz";
-                                for (var i = 0; i < Loops; i++) {
-                                    Generate(dict, Size, Loops);
-                                }
-                                console.log("[!] Usernames Generated Successfully! Check Generated.txt in The Extra Folder!"); 
-                                break;
-                        }
-                    })
-                })
-            })
-            break;
-        case "4":
-            console.clear();
-            prompt.start();
-            console.log("[?] Enter URL / Filepath!");
-            usernames = null;
+var options = menu(['Proxied Checking', 'Proxyless Checker (Proxies)', 'Username Generator', 'Use Wordlist (URL/File)'], true);
 
-            prompt.get(['Wordlist'], function(err, result) {
+switch (options) {
+    case "1":
+        console.log(`[Proxy] ${config.proxyType}`);
+        console.log(`[Tiktok Username Checker]: Started!`.inverse);
+        console.log(`[Checking %s Usernames with %s Proxies!]`.inverse, usernames.length, proxies.length);
+        for (var i in usernames) pcheck(usernames[i]);
+        break;
 
-                var Wordlist = result.Wordlist; 
-                if (validURL.isUri(Wordlist)) {
-                    console.log("[-] Selecting URL");
-                    console.log("[*] Writing to ./extra/wordlist.txt");
-
-                    download(Wordlist, "./extra/wordlist.txt", function onComplete(error) {
-                        if (error) console.log(error);
-                    });
-
-                    console.log("[*] Downloaded file!");
-                    usernames = [...new Set(fs.readFileSync('./extra/wordlist.txt', 'utf-8').replace(/\r/g, '').split('\n'))];
-                } else {
-                    console.log("[-] Selecting Filepath");
-
-                    var system = (validPath.isAbsoluteWindowsPath(Wordlist) ? "Windows" : (validPath.isAbsoluteLinuxPath(Wordlist) ? "Linux" : "Error"))
-
-                    if (system == "Error") {
-                        console.log("[!] Incorrect Filepath");
-                        return;
-                    }
-                    console.log("[*] Valid for %s", system);
-                    if (fs.existsSync(Wordlist)) {
-                        console.log("[*] File exists");
-                        usernames = [...new Set(fs.readFileSync(Wordlist, 'utf-8').replace(/\r/g, '').split('\n'))];
-                    }
-                    else {
-                        console.log("[!] File doesn't exist!");
-                    }
-                    
+    case "2":
+        console.log(`[Tiktok Username Checker]: Started!`.inverse);
+        console.log(`[Checking %s Usernames with No Proxies!]`.inverse, usernames.length, );
+        for (var i in usernames) check(usernames[i]);
+        break;
+    case "3":
+        var Size = menu(['How many chars for each Username!'], false);
+        var Loops = menu(['How many would you like to generate!'], false);
+        var Letters = menu(['Dictionary Type | AlphaNumerical | abcdefghijklmnopqrstuvwxyz0123456789', 'Dictionary Type | Alphabet | abcdefghijklmnopqrstuvwxyz'], true);
+        switch (Letters) {
+            case "1":
+                var dict = "abcdefghijklmnopqrstuvwxyz0123456789";
+                for (var i = 0; i < Loops; i++) {
+                    Generate(dict, Size, Loops);
                 }
-
-                if (usernames == null) {
-                    console.log("[!] Something went wrong... Aborting");
-                    return;
+                break;
+            case "2":
+                var dict = "abcdefghijklmnopqrstuvwxyz";
+                for (var i = 0; i < Loops; i++) {
+                    Generate(dict, Size, Loops);
                 }
+                console.log("[!] Usernames Generated Successfully! Check Generated.txt in The Extra Folder!"); 
+                break;
+        }
+        break;
+    case "4":
+        usernames = null;
 
-                prompt.start();
-                console.log("");
-                console.log(chalk("[1] Proxied Checking "));
-                console.log(chalk("[2] Proxyless Checker (Proxies)"));
-                prompt.get(['Proxy'], function(err, result) {
-                    var proxy = result.Proxy;
-                    switch (proxy) {
-                        case "1":
-                            console.log(`[Proxy] ${config.proxyType}`);
-                            console.log(`[Tiktok Username Checker]: Started!`.inverse);
-                            console.log(`[Checking %s Usernames with %s Proxies!]`.inverse, usernames.length, proxies.length);
-                            for (var i in usernames) pcheck(usernames[i]);
-                            break;
-                        case "2":
-                            console.log(`[Tiktok Username Checker]: Started!`.inverse);
-                            console.log(`[Checking %s Usernames with No Proxies!]`.inverse, usernames.length, );
-                            for (var i in usernames) check(usernames[i]);
-                            break;
-                    }
-                    console.log("[*] Exited successfully");
-                })
-            })
+        var Wordlist = menu(['Enter URL / Filepath!'], false)
+        if (validURL.isUri(Wordlist)) {
+            console.log("[-] Selecting URL");
+            console.log("[*] Writing to ./extra/wordlist.txt");
 
+            download(Wordlist, "./extra/wordlist.txt", function onComplete(error) {
+                if (error) console.log(error);
+            });
+
+            console.log("[*] Downloaded file!");
+            usernames = [...new Set(fs.readFileSync('./extra/wordlist.txt', 'utf-8').replace(/\r/g, '').split('\n'))];
+        } else {
+            console.log("[-] Selecting Filepath");
+
+            var system = (validPath.isAbsoluteWindowsPath(Wordlist) ? "Windows" : (validPath.isAbsoluteLinuxPath(Wordlist) ? "Linux" : "Error"))
+
+            if (system == "Error") {
+                console.log("[!] Incorrect Filepath");
+                return;
+            }
+            console.log("[*] Valid for %s", system);
+            if (fs.existsSync(Wordlist)) {
+                console.log("[*] File exists");
+                usernames = [...new Set(fs.readFileSync(Wordlist, 'utf-8').replace(/\r/g, '').split('\n'))];
+            }
+            else {
+                console.log("[!] File doesn't exist!");
+            }
+            
+        }
+
+        if (usernames == null) {
+            console.log("[!] Something went wrong... Aborting");
+            return;
+        }
+
+        var proxy = menu(['Proxied Checking', 'Proxyless Checker (Proxies)'], true);
+        switch (proxy) {
+            case "1":
+                console.log(`[Proxy] ${config.proxyType}`);
+                console.log(`[Tiktok Username Checker]: Started!`.inverse);
+                console.log(`[Checking %s Usernames with %s Proxies!]`.inverse, usernames.length, proxies.length);
+                for (var i in usernames) pcheck(usernames[i]);
+                break;
+            case "2":
+                console.log(`[Tiktok Username Checker]: Started!`.inverse);
+                console.log(`[Checking %s Usernames with No Proxies!]`.inverse, usernames.length, );
+                for (var i in usernames) check(usernames[i]);
+                break;
+        }
+        console.log("[*] Exited successfully");
+        break;
+    default:
+            console.log(`[!] ${chalk.hex("DDA0DD")("Unknown option:")} ` + options);
             break;
-        default:
-            console.log("[?] Unknown option [%s]", option);
-            break;
-    }
-})
+}
